@@ -1,3 +1,4 @@
+'use client';
 import { NavBar } from '../_components';
 
 export default function ViewLayout({
@@ -9,8 +10,14 @@ export default function ViewLayout({
     <html lang="en">
       <body>
         <NavBar />
-
-        {children}
+        <div
+          style={{
+            position: 'relative',
+            marginTop: 100,
+          }}
+        >
+          {children}
+        </div>
       </body>
     </html>
   );

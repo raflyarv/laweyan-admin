@@ -1,16 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Edit, Delete } from '@mui/icons-material';
-import {
-  Container,
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  IconButton,
-} from '@mui/material';
+import { Typography, ListItem, ListItemAvatar, ListItemText, IconButton } from '@mui/material';
 import React from 'react';
 import ImagePreview from './ImagePreview';
+import { useRouter } from 'next/navigation';
 
 interface SiteListProps {
   id: string;
@@ -27,6 +20,9 @@ export default function SiteListCard({
   createdBy,
   latestUpdate,
 }: SiteListProps) {
+  const { push } = useRouter();
+  const goToSiteDetail = (id: string) => push(`/site/${id}`);
+
   return (
     <>
       <ListItem
@@ -35,7 +31,9 @@ export default function SiteListCard({
           boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;',
           borderRadius: 5,
           marginBottom: 2,
+          cursor: 'pointer',
         }}
+        onClick={() => goToSiteDetail(id)}
       >
         <ListItemAvatar
           sx={{

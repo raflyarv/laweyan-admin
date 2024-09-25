@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { SiteListCard } from '@/app/_components';
 import {
+  ArrowBack,
   Delete,
   Edit,
   Explore,
@@ -33,6 +35,7 @@ import {
   Typography,
 } from '@mui/material';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 export default function SiteList() {
@@ -62,16 +65,39 @@ export default function SiteList() {
     setFilterAnchorEl(null);
   };
 
+  const { back } = useRouter();
+
   return (
     <Container
-      maxWidth="xl"
+      maxWidth="md"
       sx={{
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
-        marginTop: 15,
       }}
     >
+      <Box
+        sx={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}
+        marginBottom={2}
+      >
+        <IconButton
+          aria-label="delete"
+          size="large"
+          onClick={() => back()}
+        >
+          <ArrowBack
+            fontSize="inherit"
+            sx={{
+              color: 'text.primary',
+            }}
+          />
+        </IconButton>
+      </Box>
       <Box
         sx={{
           width: '100%',
@@ -84,7 +110,7 @@ export default function SiteList() {
         <Box
           sx={{
             display: 'flex',
-            width: '800px',
+            width: '100%',
             flexDirection: 'row',
             alignItems: 'start',
             marginBottom: 2,
@@ -115,7 +141,7 @@ export default function SiteList() {
         </Box>
 
         <FormControl
-          sx={{ width: '800px', marginBottom: 2 }}
+          sx={{ width: '100%', marginBottom: 2 }}
           variant="outlined"
         >
           <InputLabel htmlFor="search-site">Pencarian</InputLabel>
@@ -149,7 +175,7 @@ export default function SiteList() {
         {/* Sort Button and Menu */}
         <Box
           sx={{
-            width: '800px',
+            width: '100%',
             display: 'flex',
             justifyContent: 'end',
             marginX: 'auto',
@@ -230,9 +256,9 @@ export default function SiteList() {
         maxWidth={'100%'}
         marginX={'auto'}
       >
-        <List sx={{ width: '800px' }}>
+        <List sx={{ width: '100%' }}>
           <SiteListCard
-            id="1223"
+            id="1"
             name="Rumah Batik Laweyan"
             address="Jl. Sidoluhur No.21, Laweyan, Kec. Laweyan, Kota Surakarta, Jawa Tengah 5714"
             createdBy="Muhammad Tohir Rafly"
@@ -240,7 +266,7 @@ export default function SiteList() {
           />
 
           <SiteListCard
-            id="1223"
+            id="2"
             name="Rumah Batik Laweyan"
             address="Jl. Sidoluhur No.21, Laweyan, Kec. Laweyan, Kota Surakarta, Jawa Tengah 5714"
             createdBy="Muhammad Tohir Rafly"
@@ -248,7 +274,7 @@ export default function SiteList() {
           />
 
           <SiteListCard
-            id="1223"
+            id="3"
             name="Rumah Batik Laweyan"
             address="Jl. Sidoluhur No.21, Laweyan, Kec. Laweyan, Kota Surakarta, Jawa Tengah 5714"
             createdBy="Muhammad Tohir Rafly"
@@ -256,7 +282,7 @@ export default function SiteList() {
           />
 
           <SiteListCard
-            id="1223"
+            id="4"
             name="Rumah Batik Laweyan"
             address="Jl. Sidoluhur No.21, Laweyan, Kec. Laweyan, Kota Surakarta, Jawa Tengah 5714"
             createdBy="Muhammad Tohir Rafly"
