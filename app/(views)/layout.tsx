@@ -1,5 +1,6 @@
 'use client';
-import { NavBar } from '../_components';
+import React from 'react';
+import { AdminProvider } from '../_hooks/provider/AdminProvider';
 
 export default function ViewLayout({
   children,
@@ -7,18 +8,8 @@ export default function ViewLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <NavBar />
-        <div
-          style={{
-            position: 'relative',
-            marginTop: 100,
-          }}
-        >
-          {children}
-        </div>
-      </body>
-    </html>
+    <>
+      <AdminProvider>{children}</AdminProvider>
+    </>
   );
 }

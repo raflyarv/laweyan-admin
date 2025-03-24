@@ -40,7 +40,7 @@ const theme = createTheme({
     },
     disable: {
       main: '#D1D1D1',
-      contrastText: '3C3D37',
+      contrastText: '#3C3D37',
     },
 
     text: {

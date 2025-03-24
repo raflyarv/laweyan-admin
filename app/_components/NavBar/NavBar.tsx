@@ -1,8 +1,9 @@
+'use client';
+
 import {
   AppBar,
   Avatar,
   Box,
-  Button,
   Container,
   IconButton,
   Menu,
@@ -10,168 +11,171 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
 } from '@mui/material';
 import AdbIcon from '@mui/icons-material/Adb';
-import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+interface NavBarProps {
+  name?: string;
+  imageUrl?: string;
+  userType: 'admin' | 'owner'; // Prop to determine user type
+}
 
-export default function NavBar() {
-  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+export default function NavBar({ imageUrl, name, userType }: NavBarProps) {
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
+  const router = useRouter();
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
   };
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
-  return (
-    <AppBar
-      position="fixed"
-      sx={{
-        backgroundColor: 'brand.main',
-      }}
-    >
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
+  const handleProfileClick = () => {
+    // Redirect to the correct profile page based on userType
+    if (userType === 'admin') {
+      router.push('/admin/profile');
+    } else if (userType === 'owner') {
+      router.push('/owner/profile');
+    }
+    handleCloseUserMenu();
+  };
 
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' } }}
-            >
-              {pages.map((page) => (
-                <MenuItem
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                >
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
+  const handleLogoutClick = () => {
+    setOpenLogoutDialog(true);
+    handleCloseUserMenu();
+  };
+
+  const handleConfirmLogout = async () => {
+    setOpenLogoutDialog(false);
+    try {
+      await axios.post('http://localhost:5000/auth/admin/logout', {}, { withCredentials: true });
+      console.log('Logged out');
+
+      router.push('/login');
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleCancelLogout = () => {
+    setOpenLogoutDialog(false);
+  };
+
+  return (
+    <>
+      <AppBar
+        position="fixed"
+        sx={{
+          backgroundColor: 'brand.main',
+        }}
+      >
+        <Container maxWidth="xl">
+          <Toolbar
+            disableGutters
             sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
+              justifyContent: 'space-between',
             }}
           >
-            LOGO
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
-          </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton
-                onClick={handleOpenUserMenu}
-                sx={{ p: 0 }}
-              >
-                <Avatar
-                  alt="Remy Sharp"
-                  src="/static/images/avatar/2.jpg"
-                />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
+            <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+            <Typography
+              variant="h6"
+              noWrap
+              component="a"
+              href={`/${userType}`}
+              sx={{
+                mr: 2,
+                display: { xs: 'none', md: 'flex' },
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
               }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem
-                  key={setting}
-                  onClick={handleCloseUserMenu}
+              LAWEYAN WEB ADMIN
+            </Typography>
+
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton
+                  onClick={handleOpenUserMenu}
+                  sx={{ p: 0 }}
                 >
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                  <Avatar
+                    alt={name}
+                    src={`http://localhost:5000/${imageUrl}`}
+                  />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                <MenuItem onClick={handleProfileClick}>
+                  <Typography sx={{ textAlign: 'center' }}>Profil Saya</Typography>
                 </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
+                <MenuItem onClick={handleLogoutClick}>
+                  <Typography sx={{ textAlign: 'center' }}>Keluar</Typography>
+                </MenuItem>
+              </Menu>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+
+      {/* Logout Confirmation Modal */}
+      <Dialog
+        open={openLogoutDialog}
+        onClose={handleCancelLogout}
+        aria-labelledby="logout-dialog-title"
+        aria-describedby="logout-dialog-description"
+      >
+        <DialogTitle id="logout-dialog-title">Konfirmasi Keluar</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="logout-dialog-description">
+            Apakah Anda yakin ingin keluar?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCancelLogout}
+            color="primary"
+          >
+            Batal
+          </Button>
+          <Button
+            onClick={handleConfirmLogout}
+            color="primary"
+            autoFocus
+          >
+            Keluar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

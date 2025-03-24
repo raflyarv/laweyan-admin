@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
+
 import { Edit, Delete } from '@mui/icons-material';
 import { Typography, ListItem, ListItemAvatar, ListItemText, IconButton } from '@mui/material';
 import React from 'react';
 import ImagePreview from './ImagePreview';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { formattedTimestamp } from '@/app/_utils/formattedTimestamp';
 
 interface SiteListProps {
   id: string;
@@ -11,6 +14,10 @@ interface SiteListProps {
   address: string;
   createdBy: string;
   latestUpdate: any;
+  thumbnail: {
+    url: string;
+    title: string;
+  }[];
 }
 
 export default function SiteListCard({
@@ -19,10 +26,23 @@ export default function SiteListCard({
   address,
   createdBy,
   latestUpdate,
+  thumbnail,
 }: SiteListProps) {
   const { push } = useRouter();
-  const goToSiteDetail = (id: string) => push(`/site/${id}`);
+  const pathname = usePathname();
 
+  const firstSegment = pathname.split('/')[1]; // Get 'admin' or 'owner'
+
+  const goToSiteDetail = (id: string) => {
+    // Conditional navigation based on the first segment
+    if (firstSegment === 'admin') {
+      push(`site/${id}`); // Push to the admin site detail
+    } else if (firstSegment === 'owner') {
+      push(`my-site/${id}`); // Push to the owner site detail
+    } else {
+      console.log('Invalid role in URL');
+    }
+  };
   return (
     <>
       <ListItem
@@ -41,9 +61,9 @@ export default function SiteListCard({
           }}
         >
           <ImagePreview
-            src="/image/sample-image.jpg"
-            alt="Sample Image"
-            imageCount={5}
+            src={`http://localhost:5000/${thumbnail[0].url}`}
+            alt={name}
+            imageCount={thumbnail.length}
           />
         </ListItemAvatar>
         <ListItemText
@@ -100,7 +120,7 @@ export default function SiteListCard({
                 variant="body2"
                 sx={{ display: 'inline-block', color: 'text.primary', width: '100%' }}
               >
-                Update terakhir : {latestUpdate}
+                Update terakhir : {formattedTimestamp(latestUpdate)}
               </Typography>
             </React.Fragment>
           }

@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -29,6 +31,7 @@ export default function ImagePreview({ src, alt, imageCount }: HoverableImagePre
         alt={alt}
         fill
         objectFit="cover"
+        unoptimized
       />
 
       {isHovered && (

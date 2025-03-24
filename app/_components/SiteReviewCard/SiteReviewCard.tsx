@@ -1,30 +1,67 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Circle, Edit, Delete } from '@mui/icons-material';
+'use client';
+
+import { Circle, Edit, Delete, Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Avatar, Typography, IconButton, Rating } from '@mui/material';
+import { ConfirmationModal } from '@/app/_components';
+import { useState } from 'react';
 
 interface ReviewCardProps {
   id: string;
+  locationId: string;
   userName: string;
   imagePath: string;
-  reviewCount: string;
+  reviewCount: number;
   rating: number;
   datetime: string;
-  reviewTitle: string;
   reviewDescription: string;
   visitDate: string;
+  isHidden: boolean; // Added to manage visibility
+  onToggleVisibility: (id: string, isHidden: boolean) => void; // Function to handle visibility toggle
+  onDeleteReview: (id: string) => void; // Added this line to pass delete handler
 }
 
 export default function SiteReviewCard({
   id,
+  locationId,
   userName,
   imagePath,
   reviewCount,
   rating,
   datetime,
-  reviewTitle,
   reviewDescription,
   visitDate,
+  isHidden,
+  onDeleteReview,
+  onToggleVisibility, // Destructure the prop
 }: ReviewCardProps) {
+  // State for managing the visibility locally (optional, if not using onToggleVisibility directly)
+
+  const [visible, setVisible] = useState(isHidden); // Initialize based on isHidden
+
+  const handleToggleVisibility = () => {
+    const newVisibilityStatus = !visible; // Toggle the visibility state
+    console.log(`new status: ${newVisibilityStatus}`);
+
+    onToggleVisibility(id, newVisibilityStatus); // Call the function passed from the parent with new status
+    setVisible(newVisibilityStatus); // Update local state
+  };
+
+  const [isModalVisible, setIsModalVisible] = useState(false); // State for modal visibility
+
+  const handleDeleteClick = () => {
+    setIsModalVisible(true); // Show modal on delete icon click
+  };
+
+  const handleConfirmDelete = () => {
+    onDeleteReview(id); // Call delete handler on modal confirmation
+    setIsModalVisible(false); // Close modal after confirmation
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false); // Close modal on cancel or close action
+  };
+
   return (
     <>
       <Box
@@ -45,21 +82,14 @@ export default function SiteReviewCard({
           }}
           gap={2}
         >
-          <Box
+          <Avatar
+            alt={userName}
+            src={imagePath}
             sx={{
-              width: '10%',
+              width: '54px',
+              height: '54px',
             }}
-          >
-            <Avatar
-              alt={userName}
-              src={imagePath}
-              sx={{
-                width: '54px',
-                height: '54px',
-              }}
-            />
-          </Box>
-
+          />
           <Box
             sx={{
               width: '80%',
@@ -113,7 +143,7 @@ export default function SiteReviewCard({
 
           <Box
             sx={{
-              width: 'auto',
+              width: '20%',
               height: 'auto',
               display: 'flex',
               flexDirection: 'row',
@@ -121,20 +151,20 @@ export default function SiteReviewCard({
             }}
           >
             <IconButton
-              aria-label="delete"
+              aria-label="edit"
               size="large"
-              onClick={() => alert(`Edit Ulasan: ${id}`)}
+              onClick={handleToggleVisibility}
             >
-              <Edit
-                sx={{
-                  color: 'primary.main',
-                }}
-              />
+              {!visible ? (
+                <Visibility sx={{ color: 'green' }} />
+              ) : (
+                <VisibilityOff sx={{ color: 'red' }} />
+              )}
             </IconButton>
             <IconButton
               aria-label="delete"
               size="large"
-              onClick={() => alert(`Hapus Ulasan: ${id}`)}
+              onClick={handleDeleteClick}
             >
               <Delete
                 sx={{
@@ -157,12 +187,6 @@ export default function SiteReviewCard({
         >
           <Typography
             variant="body1"
-            fontWeight={600}
-          >
-            {reviewTitle}
-          </Typography>
-          <Typography
-            variant="body1"
             sx={{
               textOverflow: 'ellipsis',
               display: '-webkit-box',
@@ -171,7 +195,27 @@ export default function SiteReviewCard({
               WebkitLineClamp: 4,
             }}
           >
-            {reviewDescription}
+            {visible ? (
+              <Typography
+                variant="body1"
+                color="gray"
+              >
+                This review is hidden.
+              </Typography>
+            ) : (
+              <Typography
+                variant="body1"
+                sx={{
+                  textOverflow: 'ellipsis',
+                  display: '-webkit-box',
+                  overflow: 'hidden',
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: 4,
+                }}
+              >
+                {reviewDescription}
+              </Typography>
+            )}
           </Typography>
         </Box>
 
@@ -192,6 +236,13 @@ export default function SiteReviewCard({
           <Typography variant="body1"> {visitDate} </Typography>
         </Box>
       </Box>
+      <ConfirmationModal
+        open={isModalVisible}
+        onClose={handleModalClose}
+        onConfirm={handleConfirmDelete}
+        title=""
+        description="Apakah Anda yakin ingin menghapus ulasan ini? Tindakan ini tidak dapat dibatalkan."
+      />
     </>
   );
 }
